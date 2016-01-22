@@ -10,4 +10,24 @@ context-free start-symbols
 
 context-free syntax
 
-  Start.Module = ID
+  Start.Module = [def [ID] = object { [TypeDecl*] [Method*] }]
+
+  TypeDecl.TypeDecl = [type [ID] { [Signature*] }]
+
+  Method.Method = [method [Signature] { [Statement*] [Expression] }]
+
+  Statement.Def = [def [ID] : [Type] = [Expression];]
+
+  Expression.Object = [object { [Method*] }]
+
+  Expression.Request = [[Expression].[ID]([{Expression ","}*])]
+
+  Expression.Variable = ID
+
+  Type.TypeRef = ID
+
+  Type.Type = [type { [Signature*] }]
+
+  Signature.Signature = [[ID]([{Parameter ","}*]) -> [Type]]
+
+  Parameter.Parameter = [[ID] : [Type]]
