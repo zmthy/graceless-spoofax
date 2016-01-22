@@ -1,0 +1,26 @@
+module Graceless.main
+
+imports
+
+  Colorer
+  Menus
+  Syntax
+  Views
+
+language
+
+  name : Graceless
+
+  extensions : grace
+
+  table         : include/Graceless.tbl
+  start symbols : Start
+
+  provider : include/graceless.ctree
+  provider : include/graceless-java.jar
+  observer : editor-analyze (multifile)
+
+references
+
+  reference _ : editor-resolve
+  hover _     : editor-hover
