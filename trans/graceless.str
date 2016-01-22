@@ -8,6 +8,9 @@ imports
   analysis
   outline
 
+  names/names
+  types/types
+
 rules // Editor services
 
   editor-outline:

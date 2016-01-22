@@ -26,8 +26,15 @@ context-free syntax
 
   Type.TypeRef = ID
 
-  Type.Type = [type { [Signature*] }]
+  Type.Interface = [type { [Signature*] }]
 
   Signature.Signature = [[ID]([{Parameter ","}*]) -> [Type]]
 
   Parameter.Parameter = [[ID] : [Type]]
+
+// Declaration of the syntax for semantic type information.
+context-free syntax
+
+  Interface.Type = Structure*
+
+  Structure.Signature = [[Interface*] [Interface]]

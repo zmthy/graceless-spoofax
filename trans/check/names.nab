@@ -1,0 +1,50 @@
+module names
+
+imports
+  src-gen/signatures/Graceless-sig
+
+namespaces Type Method Variable
+
+binding rules
+
+  Module(name, _, methods) :
+    defines Variable name of type mtypes
+      where methods has type mtypes
+    scopes Type, Method
+
+  TypeDecl(name, sigs) :
+    defines Type name of type Type(stypes)
+      where sigs has type stypes
+    scopes Method
+
+  Method(_, _, _) :
+    scopes Variable
+
+  Def(name, dtype, _) :
+    defines Variable name of type dtype'
+      where dtype has type dtype'
+
+  Object(_) :
+    scopes Method, Variable
+
+  Request(receiver, name, _) :
+    refers to Method name in rtype
+      where receiver has type rtype
+
+  Variable(name) :
+    refers to Variable name
+
+  TypeRef(name) :
+    refers to Type name
+
+  Interface(_) :
+    scopes Method
+
+  Signature(name, params, otype) :
+    defines Method name of type Signature(ptypes, otype')
+      where params has type ptypes
+        and otype has type otype'
+
+  Parameter(name, ptype) :
+    defines Variable name of type ptype'
+      where ptype has type ptype'
