@@ -12,7 +12,7 @@ context-free syntax
 
   Start.Module = [def [ID] = object { [TypeDecl*] [Method*] }]
 
-  TypeDecl.TypeDecl = [type [ID] { [Signature*] }]
+  TypeDecl.TypeDecl = [type [ID] = [Type]]
 
   Method.Method = [method [Signature] { [Statement*] [Expression] }]
 

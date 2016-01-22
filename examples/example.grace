@@ -2,7 +2,7 @@
 
 def module = object {
 
-  type Object {}
+  type Object = type {}
 
   method test() -> Object { object {} }
 

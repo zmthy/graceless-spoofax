@@ -5,9 +5,9 @@ imports
 
 type rules
 
-  TypeDecl(name, sigs) :-
+  TypeDecl(name, value) :-
     where definition of name : Type(_)
-     else error $[Recursive type in the declaration of [name]] on sigs
+     else error $[Recursive type in the declaration of [name]] on value
 
   Method(sig, _, result) : stype
     where sig : stype

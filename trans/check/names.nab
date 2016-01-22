@@ -12,10 +12,9 @@ binding rules
       where methods has type mtypes
     scopes Type, Method
 
-  TypeDecl(name, sigs) :
-    defines Type name of type Type(stypes)
-      where sigs has type stypes
-    scopes Method
+  TypeDecl(name, value) :
+    defines Type name of type ttype
+      where value has type ttype
 
   Method(_, _, _) :
     scopes Variable
