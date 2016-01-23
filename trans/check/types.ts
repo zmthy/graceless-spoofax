@@ -18,6 +18,13 @@ type rules
      else error $[Incompatible type in method [name]:
                   expected [otype], got [rtype]] on result
 
+  Def(name, dtype, value) :-
+    where dtype : dtype'
+      and value : vtype
+      and dtype' == vtype
+     else error $[Incompatible type in def [name]:
+                  expected [dtype'], got [vtype]] on value
+
   Object(methods) : Interface(msigs)
     where methods : msigs
 
