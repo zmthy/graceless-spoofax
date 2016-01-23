@@ -1,6 +1,7 @@
 /.cache
 /bin
 /editor/java/trans
+/editor/java/*/generated
 /editor/*.generated.*
 /include
 /src-gen

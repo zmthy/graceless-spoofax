@@ -27,3 +27,7 @@ menus
       action: "Partition" = debug-task-partition
       action: "Selection" = debug-task-selection
     end
+
+  menu: "Run" (openeditor)
+    action: "Run"         = editor-run-program
+    action: "Run (Debug)" = editor-run-program-debug

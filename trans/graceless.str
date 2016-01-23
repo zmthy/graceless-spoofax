@@ -11,6 +11,10 @@ imports
   names/names
   types/types
 
+signature
+  constructors
+    R_init_Value : Value -> Result
+
 rules // Editor services
 
   editor-outline:
@@ -25,6 +29,17 @@ rules // Editor services
     ; filename := <guarantee-extension(|$[pp.[ext]])> path
     ; result   := <pp-debug> node
 
+  editor-run-program-debug :
+    (selected, position, ast, path, project-path) -> (filename, result)
+    with
+      (filename, result) := <run-program-basic-builder>
+
+  editor-run-program :
+    tuple@(selected, position, ast, path, project-path) -> (filename, result)
+    with
+      (filename, R_init_Value(result)) :=
+        <run-program-basic-builder> tuple
+
 rules // Debugging
 
   debug-show-aterm:
@@ -32,3 +47,13 @@ rules // Debugging
     with
       filename := <guarantee-extension(|"aterm")> path
     ; result   := node
+
+rules // Running
+
+  external runprogram(|)
+
+  run-program-basic-builder :
+    (selected, position, ast, path, project-path) -> (filename, result)
+    with
+      filename := <guarantee-extension(|"run.aterm")> path;
+      result := <strip-annos; debug(!"ast: "); runprogram> ast
