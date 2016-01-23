@@ -48,8 +48,9 @@ type rules
   Interface(sigs) : Interface(stypes)
     where sigs : stypes
 
-  Signature(name, _, _) : stype
-    where definition of name : stype
+  Signature(name, params, otype) : Signature(name, ptypes, otype')
+    where params : ptypes
+      and otype : otype'
 
-  Parameter(name, ptype) : ptype
-    where definition of name : ptype
+  Parameter(name, ptype) : ptype'
+    where ptype : ptype'
