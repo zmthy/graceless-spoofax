@@ -1,0 +1,48 @@
+module trans/semantics/interpret
+
+imports
+  src-gen/ds-signatures/Graceless-sig
+  trans/semantics/runtime/environment
+  trans/semantics/values
+
+signature
+  arrows
+    Program --> Value
+    Body --> Value
+    Expression --> Value
+    List(Expression) --> List(Value)
+    List(Parameter) --> List(String)
+
+rules
+
+  Module(_, methods, expr) --> object
+    where initObject(methods) --> module;
+          Self module |- expr --> object.
+
+  Body([], object) --> object.
+  Body([Def(name : String, _, value) | stmts], result) --> object'
+    where value --> object;
+          Env bindVar(name, object) |- Body(stmts, result) --> object'.
+
+  Object(methods) --> initObject(methods).
+
+  Request(receiver@Methods(methods),
+          name : String,
+          args : List(Value)) --> object
+    where methods[name] => Method(Signature(_, params, _), body);
+          Self receiver, Env bindVars(params, args) |- body --> object.
+
+  Variable(name : String) --> readVar(name).
+
+  Self Self(self) |- Self() --> self.
+
+rules
+
+  [] : List(Expression) --> [].
+  [expr | exprs] : List(Expression) --> [object | objects]
+    where expr --> object;
+          exprs --> objects.
+
+  [] : List(Parameter) --> [].
+  [Parameter(name : String, _) | params] : List(Parameter) --> [name | names]
+    where params --> names.

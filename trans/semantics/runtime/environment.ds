@@ -1,0 +1,24 @@
+module trans/semantics/runtime/environment
+
+imports
+  trans/semantics/values
+
+signature
+  sort aliases
+    Env = Map<String, Value>
+  variables
+    E : Env
+  constructors
+    bindVar  : String * Value --> Env
+    readVar  : String --> Value
+    bindVars : List(String) * List(Value) --> Env
+
+rules
+
+  E |- bindVar(name, object) --> { name |--> object, E }.
+
+  E |- readVar(name) --> E[name].
+
+  bindVars([], []) --> {}.
+  bindVars([name | names], [object | objects]) --> { name |--> object, E }
+    where bindVars(names, objects) --> E.

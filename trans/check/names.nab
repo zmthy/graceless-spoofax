@@ -16,7 +16,7 @@ binding rules
     defines Type name of type ttype
       where value has type ttype
 
-  Method(_, _, _) :
+  Method(_, _) :
     scopes Variable
 
   Def(name, dtype, _) :

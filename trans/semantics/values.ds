@@ -1,0 +1,24 @@
+module trans/semantics/values
+
+imports
+  src-gen/ds-signatures/Graceless-sig
+
+signature
+  sorts Value Self
+  constructors
+    Methods : Map<String, Method> -> Value
+    Self : Value -> Self {implicit}
+    Init : Self
+
+  constructors
+    initObject : List(Method) --> Value
+    lookupMethod : Value * String --> Method
+
+rules
+
+  initObject([]) --> Methods({}).
+  initObject([method@Method(Signature(name : String, _, _), _) | methods]) -->
+    Methods({ name |--> method, methods' })
+      where initObject(methods) => Methods(methods').
+
+  lookupMethod(Methods(object), name) --> object[name].

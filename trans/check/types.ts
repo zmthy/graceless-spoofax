@@ -9,7 +9,10 @@ type rules
     where definition of name : Interface(_)
      else error $[Recursive type in the declaration of [name]] on value
 
-  Method(sig, _, result) : stype
+  Body(_, result) : rtype
+    where result : rtype
+
+  Method(sig, result) : stype
     where sig : stype
       and stype => Signature(name, _, otype)
      else error "Failed to determine the method type" on sig

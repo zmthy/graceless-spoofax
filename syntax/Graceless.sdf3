@@ -14,7 +14,9 @@ context-free syntax
 
   TypeDecl.TypeDecl = [type [ID] = [Type]]
 
-  Method.Method = [method [Signature] { [Statement*] [Expression] }]
+  Method.Method = [method [Signature] { [Body] }]
+
+  Body.Body = [[Statement*] [Expression]]
 
   Statement.Def = [def [ID] : [Type] = [Expression];]
 

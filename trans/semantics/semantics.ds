@@ -1,0 +1,17 @@
+module trans/semantics/semantics
+
+imports
+  src-gen/ds-signatures/Graceless-sig
+  trans/semantics/interpret
+  trans/semantics/values
+
+// Entry point
+
+signature
+  arrows
+    Program -init-> Value
+
+rules
+
+  prog : Program -init-> value
+    where Env {}, Self Init() |- prog --> value.
