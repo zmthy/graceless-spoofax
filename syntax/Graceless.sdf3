@@ -6,11 +6,11 @@ imports
 
 context-free start-symbols
 
-  Start
+  Program
 
 context-free syntax
 
-  Start.Module = [def [ID] = object { [TypeDecl*] [Method*] }]
+  Program.Module = [[TypeDecl*] [Method*] [Expression]]
 
   TypeDecl.TypeDecl = [type [ID] = [Type]]
 
@@ -24,6 +24,8 @@ context-free syntax
 
   Expression.Variable = ID
 
+  Expression.Self = [self]
+
   Type.TypeRef = ID
 
   Type.Interface = [type { [Signature*] }]
@@ -31,10 +33,3 @@ context-free syntax
   Signature.Signature = [[ID]([{Parameter ","}*]) -> [Type]]
 
   Parameter.Parameter = [[ID] : [Type]]
-
-// Declaration of the syntax for semantic type information.
-context-free syntax
-
-  Interface.Type = Structure*
-
-  Structure.Signature = [[Interface*] [Interface]]

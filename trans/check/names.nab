@@ -7,10 +7,10 @@ namespaces Type Method Variable
 
 binding rules
 
-  Module(name, _, methods) :
-    defines Variable name of type mtypes
+  Module(_, methods, _) :
+    implicitly defines Variable Self() of type Interface(mtypes)
       where methods has type mtypes
-    scopes Type, Method
+    scopes Type, Method, Variable
 
   TypeDecl(name, value) :
     defines Type name of type ttype
@@ -23,7 +23,9 @@ binding rules
     defines Variable name of type dtype'
       where dtype has type dtype'
 
-  Object(_) :
+  Object(methods) :
+    implicitly defines Variable Self() of type Interface(mtypes)
+      where methods has type mtypes
     scopes Method, Variable
 
   Request(receiver, name, _) :
@@ -33,6 +35,9 @@ binding rules
   Variable(name) :
     refers to Variable name
 
+  Self() :
+    refers to Variable Self()
+
   TypeRef(name) :
     refers to Type name
 
@@ -40,7 +45,7 @@ binding rules
     scopes Method
 
   Signature(name, params, otype) :
-    defines Method name of type Signature(ptypes, otype')
+    defines Method name of type Signature(name, ptypes, otype')
       where params has type ptypes
         and otype has type otype'
 
