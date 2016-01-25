@@ -9,12 +9,12 @@ type Pair = type {
 
 method pair(first : Object, second : Object) -> Pair {
   object {
-    method first() -> Object {
-      first
-    }
-
     method second() -> Object {
       second
+    }
+
+    method first() -> Object {
+      first
     }
   }
 }
