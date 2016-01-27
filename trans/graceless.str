@@ -8,9 +8,6 @@ imports
   analysis
   outline
 
-  names/names
-  types/types
-
 signature
   constructors
     R_init_Value : Value -> Result

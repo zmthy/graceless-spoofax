@@ -1,4 +1,4 @@
-module trans/semantics/values
+module semantics/values
 
 imports
   src-gen/ds-signatures/Graceless-sig

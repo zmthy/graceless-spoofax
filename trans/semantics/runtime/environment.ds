@@ -1,7 +1,7 @@
-module trans/semantics/runtime/environment
+module semantics/runtime/environment
 
 imports
-  trans/semantics/values
+  semantics/values
 
 signature
   sort aliases

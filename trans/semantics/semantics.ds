@@ -1,9 +1,9 @@
-module trans/semantics/semantics
+module semantics/semantics
 
 imports
   src-gen/ds-signatures/Graceless-sig
-  trans/semantics/interpret
-  trans/semantics/values
+  semantics/interpret
+  semantics/values
 
 // Entry point
 

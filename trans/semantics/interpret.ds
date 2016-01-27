@@ -1,9 +1,9 @@
-module trans/semantics/interpret
+module semantics/interpret
 
 imports
   src-gen/ds-signatures/Graceless-sig
-  trans/semantics/runtime/environment
-  trans/semantics/values
+  semantics/runtime/environment
+  semantics/values
 
 signature
   arrows

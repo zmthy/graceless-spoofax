@@ -1,4 +1,4 @@
-module types
+module check/types
 
 imports
   src-gen/signatures/Graceless-sig

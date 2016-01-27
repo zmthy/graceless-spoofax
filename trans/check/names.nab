@@ -1,4 +1,4 @@
-module names
+module check/names
 
 imports
   src-gen/signatures/Graceless-sig
