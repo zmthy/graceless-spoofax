@@ -4,21 +4,32 @@ imports
   semantics/values
 
 signature
+  sorts Variable
+  constructors
+    Def : Value -> Variable
+    Var : Value -> Variable
+
   sort aliases
-    Env = Map<String, Value>
+    Env = Map<String, Variable>
   variables
     E : Env
   constructors
-    bindVar  : String * Value --> Env
-    readVar  : String --> Value
-    bindVars : List(String) * List(Value) --> Env
+    bindVar    : String * Variable --> Env
+    readVar    : String --> Variable
+    readValue  : String --> Value
+    bindValues : List(String) * List(Value) --> Env
 
 rules
 
-  E |- bindVar(name, object) --> { name |--> object, E }.
+  E |- bindVar(name, var) --> { name |--> var, E }.
 
   E |- readVar(name) --> E[name].
 
-  bindVars([], []) --> {}.
-  bindVars([name | names], [object | objects]) --> { name |--> object, E }
-    where bindVars(names, objects) --> E.
+  readValue(name) --> value
+    where readVar(name) --> Def(value).
+  readValue(name) --> value
+    where readVar(name) --> Var(value).
+
+  bindValues([], []) --> {}.
+  bindValues([name | names], [value | values]) --> { name |--> Def(value), E }
+    where bindValues(names, values) --> E.

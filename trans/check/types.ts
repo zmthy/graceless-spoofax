@@ -21,12 +21,28 @@ type rules
      else error $[Incompatible type in method [name]:
                   expected [otype], got [rtype]] on result
 
-  Def(name, dtype, value) :-
+  Def(name, dtype, expr) :-
     where dtype : dtype'
-      and value : vtype
-      and dtype' == vtype
+      and expr : etype
+      and dtype' == etype
      else error $[Incompatible type in def [name]:
-                  expected [dtype'], got [vtype]] on value
+                  expected [dtype'], got [etype]] on expr
+
+  Var(name, vtype, expr) :-
+    where vtype : vtype'
+      and expr : etype
+      and vtype' == etype
+     else error $[Incompatible type in var [name]:
+                  expected [vtype'], got [etype]] on expr
+
+  Assign(name, expr) :-
+    where definition of name : VariableType(vtype, kind)
+      and expr : etype
+      and vtype == etype
+     else error $[Incompatible type in assignment to [name]:
+                  expected [vtype], got [etype]] on expr
+      and kind == Var()
+     else error $[Invalid assignment to constant def [name]] on name
 
   Object(methods) : Interface(msigs)
     where methods : msigs
@@ -40,7 +56,7 @@ type rules
                   expected [ptypes], got [atypes]] on args
 
   Variable(name) : vtype
-    where definition of name : vtype
+    where definition of name : VariableType(vtype, _)
 
   self@Self() : stype
     where definition of self : stype

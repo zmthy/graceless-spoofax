@@ -16,6 +16,8 @@ context-free syntax
   Body.Body = [[Statement*] [Expression]]
 
   Statement.Def = [def [ID] : [Type] = [Expression];]
+  Statement.Var = [var [ID] : [Type] := [Expression];]
+  Statement.Assign = [[ID] := [Expression];]
 
   Expression.Object = [object { [Method*] }]
   Expression.Request = [[Expression].[ID]([{Expression ","}*])]
@@ -28,3 +30,10 @@ context-free syntax
   Signature.Signature = [[ID]([{Parameter ","}*]) -> [Type]]
 
   Parameter.Parameter = [[ID] : [Type]]
+
+// Only used in the type checker, not part of the concrete syntax.
+context-free syntax
+  VariableType.VariableType = [[Type] [VariableKind]]
+
+  VariableKind.Var = []
+  VariableKind.Def = []

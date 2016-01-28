@@ -20,9 +20,16 @@ rules
           Self module |- expr --> object.
 
   Body([], object) --> object.
-  Body([Def(name : String, _, value) | stmts], result) --> object'
-    where value --> object;
-          Env bindVar(name, object) |- Body(stmts, result) --> object'.
+  Body([Def(name : String, _, expr) | stmts], result) --> value'
+    where expr --> value;
+          Env bindVar(name, Def(value)) |- Body(stmts, result) --> value'.
+  Body([Var(name : String, _, expr) | stmts], result) --> value'
+    where expr --> value;
+          Env bindVar(name, Var(value)) |- Body(stmts, result) --> value'.
+  Body([Assign(name : String, expr) | stmts], result) --> value'
+    where expr --> value;
+          readVar(name) --> Var(_);
+          Env bindVar(name, Var(value)) |- Body(stmts, result) --> value'.
 
   Object(methods) --> initObject(methods).
 
@@ -30,9 +37,9 @@ rules
           name : String,
           args : List(Value)) --> object
     where methods[name] => Method(Signature(_, params, _), body);
-          Self receiver, Env bindVars(params, args) |- body --> object.
+          Self receiver, Env bindValues(params, args) |- body --> object.
 
-  Variable(name : String) --> readVar(name).
+  Variable(name : String) --> readValue(name).
 
   Self Self(self) |- Self() --> self.
 

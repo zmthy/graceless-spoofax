@@ -2,6 +2,8 @@
 
 type Object = type {}
 
-method test() -> Object { object {} }
+method run() -> Object {
+  object {}
+}
 
-self.test()
+self.run()

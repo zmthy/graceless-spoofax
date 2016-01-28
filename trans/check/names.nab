@@ -20,8 +20,15 @@ binding rules
     scopes Variable
 
   Def(name, dtype, _) :
-    defines Variable name of type dtype'
+    defines Variable name of type VariableType(dtype', Def())
       where dtype has type dtype'
+
+  Var(name, vtype, _) :
+    defines Variable name of type VariableType(vtype', Var())
+      where vtype has type vtype'
+
+  Assign(name, _) :
+    refers to Variable name
 
   Object(methods) :
     implicitly defines Variable Self() of type Interface(mtypes)
@@ -50,5 +57,5 @@ binding rules
         and otype has type otype'
 
   Parameter(name, ptype) :
-    defines Variable name of type ptype'
+    defines Variable name of type VariableType(ptype', Def())
       where ptype has type ptype'

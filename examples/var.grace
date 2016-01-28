@@ -3,7 +3,7 @@
 type Object = type {}
 
 method run() -> Object {
-  def x : Object = object {};
+  var x : Object := object {};
   x
 }
 
