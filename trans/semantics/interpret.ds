@@ -3,53 +3,82 @@ module semantics/interpret
 imports
   src-gen/ds-signatures/Graceless-sig
   semantics/runtime/environment
+  semantics/runtime/store
   semantics/values
 
 signature
   arrows
-    Program --> Value
-    Body --> Value
-    Expression --> Value
-    List(Expression) --> List(Value)
-    List(Parameter) --> List(String)
+    Term --> Value
+    RTerm --> Value
+    Arguments --> Values
 
 rules
 
-  Module(_, methods, expr) --> object
-    where initObject(methods) --> module;
-          Self module |- expr --> object.
+  Object(methods, decls) --> Object(location)
+    where newObject(methods, decls) --> location.
 
-  Body([], object) --> object.
-  Body([Def(name : String, _, expr) | stmts], result) --> value'
-    where expr --> value;
-          Env bindVar(name, Def(value)) |- Body(stmts, result) --> value'.
-  Body([Var(name : String, _, expr) | stmts], result) --> value'
-    where expr --> value;
-          Env bindVar(name, Var(value)) |- Body(stmts, result) --> value'.
-  Body([Assign(name : String, expr) | stmts], result) --> value'
-    where expr --> value;
-          readVar(name) --> Var(_);
-          Env bindVar(name, Var(value)) |- Body(stmts, result) --> value'.
+  // Qualified requests execute their receiver and arguments to objects, then
+  // run as a runtime request on the resulting location.
+  Request(receiver, name : String, args) --> result
+    where receiver --> Object(receiver');
+          args --> Objects(args');
+          RRequest(receiver', Name(name), args') --> result.
 
-  Object(methods) --> initObject(methods).
+  // Unqualified requests resolve the method to a receiver, then proceed like a
+  // qualified request.  We can't delegate directly to the rule above because
+  // the resolved receiver is an object location, which isn't a valid Term.
+  Request(name : String, args) --> result
+    where resolveMethod(Name(name)) --> receiver;
+          args --> Objects(args');
+          RRequest(receiver, Name(name), args') --> result.
 
-  Request(receiver@Methods(methods),
-          name : String,
-          args : List(Value)) --> object
-    where methods[name] => Method(Signature(_, params, _), body);
-          Self receiver, Env bindValues(params, args) |- body --> object.
+  // Like qualified requests, but with an Assign name and only one argument.
+  AssignRequest(receiver, name : String, arg) --> result
+    where receiver --> Object(receiver');
+          arg --> Object(arg');
+          RRequest(receiver', Assign(name), [arg']) --> result.
 
-  Variable(name : String) --> readValue(name).
+  // Like unqualified requests, but with an Assign name and only one argument.
+  AssignRequest(name : String, arg) --> result
+    where resolveMethod(Assign(name)) --> receiver;
+          arg --> Object(arg');
+          RRequest(receiver, Assign(name), [arg']) --> result.
 
-  Self Self(self) |- Self() --> self.
+  Self Self(self) |- Self() --> Object(self).
 
 rules
 
-  [] : List(Expression) --> [].
-  [expr | exprs] : List(Expression) --> [object | objects]
-    where expr --> object;
-          exprs --> objects.
+  Ref(location) --> Object(location).
 
-  [] : List(Parameter) --> [].
-  [Parameter(name : String, _) | params] : List(Parameter) --> [name | names]
-    where params --> names.
+  Term(term) --> result
+    where term --> result.
+
+  RRequest(receiver, name, args) --> result'
+    where fetch(receiver) --> object;
+          lookup(object, name) --> RMethod(_, params, Body(Body(_, result)));
+          initObject(matchArgs(params, args)) --> methods;
+          allocate(methods) --> context;
+          bindMethods(context, methodNames(methods)) --> E;
+          Env E |- result --> result'.
+
+  RRequest(receiver, name, _) --> Error()
+    where fetch(receiver) --> object;
+          lookup(object, name) --> RMethod(_, _, Uninitialised()).
+
+  Assign(into, field, assign, next) --> next'
+    where into --> Object(into');
+          assign --> Object(assign');
+          setField(into', field, assign') --> S;
+          next :: S --> next'.
+
+rules
+
+  NoArguments() --> Objects([]).
+  Arguments([term | terms]) --> Objects([location | locations])
+    where term --> Object(location);
+          Arguments(terms) --> Objects(locations).
+  Arguments([term | _]) --> Errors()
+    where term --> Error().
+  Arguments([term | terms]) --> Errors()
+    where term --> Object(_);
+          Arguments(terms) --> Errors().

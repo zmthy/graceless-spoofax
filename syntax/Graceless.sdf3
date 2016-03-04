@@ -4,36 +4,51 @@ imports
   Common
 
 context-free start-symbols
-  Program
+  Term
 
 context-free syntax
-  Program.Module = [[TypeDecl*] [Method*] [Expression]]
+  // Regular method declaration, with a name, parameters, and a body.
+  Method.Method = [method [ID][Parameters] { [Body] }]
 
-  TypeDecl.TypeDecl = [type [ID] = [Type]]
+  // Assign method, with a single parameter.  Typically used internally to build
+  // assignment methods for mutable fields, but can be declared by the user.
+  Method.AssignMethod = [method [ID]:=([ID]) { [Body] }]
 
-  Method.Method = [method [Signature] { [Body] }]
+  // Parameters are either present with parentheses, or empty.
+  Parameters.Parameters = [([ID+])]
+  Parameters.NoParameters = []
 
-  Body.Body = [[Statement*] [Expression]]
+  // A method body consisting of a sequence of variable declarations followed by
+  // a return expression.
+  Body.Body = [[Decl*] [Term]]
 
-  Statement.Def = [def [ID] : [Type] = [Expression];]
-  Statement.Var = [var [ID] : [Type] := [Expression];]
-  Statement.Assign = [[ID] := [Expression];]
+  // Declaration of a constant field or variable with the given value.
+  Decl.Def = [def [ID] = [Term];]
 
-  Expression.Object = [object { [Method*] }]
-  Expression.Request = [[Expression].[ID]([{Expression ","}*])]
-  Expression.Variable = ID
-  Expression.Self = [self]
+  // Declaration of a mutable field or variable with no initial value.
+  Decl.Var = [var [ID];]
 
-  Type.TypeRef = ID
-  Type.Interface = [type { [Signature*] }]
+  // Declaration of a mutable field or variable with the given value.
+  Decl.Var = [var [ID] := [Term];]
 
-  Signature.Signature = [[ID]([{Parameter ","}*]) -> [Type]]
+  // Object literal expression.
+  Term.Object = [object { [Method*] [Decl*] }]
 
-  Parameter.Parameter = [[ID] : [Type]]
+  // Requests qualified by a receiver.
+  Term.Request = [[Term].[ID][Arguments]]
 
-// Only used in the type checker, not part of the concrete syntax.
-context-free syntax
-  VariableType.VariableType = [[Type] [VariableKind]]
+  // Requests not qualified by a receiver.
+  Term.Request = [[ID][Arguments]]
 
-  VariableKind.Var = []
-  VariableKind.Def = []
+  // Requests to assign methods, qualified by a receiver.
+  Term.AssignRequest = [[Term].[ID] := [Term]]
+
+  // Requests to an assign methods, not qualified by a receiver.
+  Term.AssignRequest = [[ID] := [Term]]
+
+  // Access to the surrounding (explicitly declared) object.
+  Term.Self = [self]
+
+  // Arguments are either present with parentheses, or empty.
+  Arguments.Arguments = [([Term+])]
+  Arguments.NoArguments = []

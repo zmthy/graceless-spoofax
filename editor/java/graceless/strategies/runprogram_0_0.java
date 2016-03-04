@@ -4,7 +4,7 @@ import org.spoofax.interpreter.terms.IStrategoTerm;
 import org.strategoxt.lang.Context;
 import org.strategoxt.lang.Strategy;
 
-import ds.generated.interpreter.Generic_A_Program;
+import ds.generated.interpreter.Generic_A_Term;
 
 public class runprogram_0_0 extends Strategy {
 
@@ -12,7 +12,7 @@ public class runprogram_0_0 extends Strategy {
 
     @Override
     public IStrategoTerm invoke(Context context, IStrategoTerm program) {
-        return new Generic_A_Program(null, program).exec_init().toStrategoTerm(
+        return new Generic_A_Term(null, program).exec_init().toStrategoTerm(
                 context.getFactory());
     }
 }

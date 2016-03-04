@@ -12,9 +12,6 @@ imports
   runtime/analysis/-
   runtime/editor/-
 
-  names/check/names
-  types/check/types
-
   pp
 
 rules // Analysis

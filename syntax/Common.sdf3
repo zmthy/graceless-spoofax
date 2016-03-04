@@ -17,7 +17,7 @@ lexical syntax
 
   ID             = Keyword {reject}
 
-  Keyword        = "def" | "method" | "self" | "type"
+  Keyword        = "def" | "method" | "self"
 
 lexical restrictions
 

@@ -2,6 +2,8 @@ module semantics/semantics
 
 imports
   src-gen/ds-signatures/Graceless-sig
+  semantics/runtime/environment
+  semantics/runtime/store
   semantics/interpret
   semantics/values
 
@@ -13,5 +15,5 @@ signature
 
 rules
 
-  prog : Program -init-> value
-    where Env {}, Self Init() |- prog --> value.
+  Program(term) -init-> value
+    where Env {}, Self Init() |- term --> value.

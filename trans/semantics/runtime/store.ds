@@ -1,0 +1,53 @@
+module semantics/runtime/store
+
+imports
+  semantics/values
+
+signature
+  sort aliases
+    Store = Map<Location, Object>
+  variables
+    S : Store
+
+  constructors
+    fetch    : Location --> Object
+    store    : Location * Object --> Store
+    allocate : Object --> Location
+
+rules
+
+  fetch(location) :: S --> S[location].
+
+  store(location, object) :: S --> { location |--> object, S }.
+
+  allocate(object) --> location :: S
+    where fresh => location;
+          store(location, object) --> S.
+
+signature
+  constructors
+    newObject : List(Method) --> Location
+    newObject : List(Method) * List(Decl) --> Location
+
+rules
+
+  newObject(methods) --> allocate(initObject(methods)).
+
+  newObject(methods, decls) --> allocate(initObject(methods, decls)).
+
+signature
+  constructors
+    setField : Location * String * Location --> Store
+    updateMethod : List(RMethod) * Name * RTerm --> Object
+
+rules
+
+  setField(location, name, value) :: S -->
+    store(location, updateMethod(S[location], Name(name), Ref(value))).
+
+  updateMethod([RMethod(mname, _, _) | methods], name, body) -->
+    [RMethod(name, [], body) | methods]
+      where name == mname.
+  updateMethod([method@RMethod(mname, _, _) | methods], name, body) -->
+    [method | updateMethod(methods, name, body)]
+      where name != mname.
