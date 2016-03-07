@@ -11,9 +11,9 @@ imports
 
 signature
   arrows
-    Program -init-> Value
+    Term -init-> Value
 
 rules
 
-  Program(term) -init-> value
-    where Env {}, Self Init() |- term --> value.
+  term : Term -init-> value
+    where Env {}, Self Init() |- term :: Store {} --> value.

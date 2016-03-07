@@ -48,22 +48,22 @@ rules
 
 rules
 
+  Term(term) --> term.
+
   Ref(location) --> Object(location).
 
-  Term(term) --> result
-    where term --> result.
-
-  RRequest(receiver, name, args) --> result'
-    where fetch(receiver) --> object;
-          lookup(object, name) --> RMethod(_, params, Body(Body(_, result)));
-          initObject(matchArgs(params, args)) --> methods;
-          allocate(methods) --> context;
-          bindMethods(context, methodNames(methods)) --> E;
-          Env E |- result --> result'.
+  RRequest(receiver, name, args) --> result
+    where fetch(receiver) --> Methods(object);
+          lookup(object, name) --> RMethod(_, params, RBody(decls, body));
+          matchArgs(params, args) --> methods;
+          concat(methods, declsToMethods(decls)) --> methods';
+          allocate(Methods(methods')) --> context;
+          bindMethods(context, names(methods')) --> E;
+          Env E, Self receiver |- body --> result.
 
   RRequest(receiver, name, _) --> Error()
-    where fetch(receiver) --> object;
-          lookup(object, name) --> RMethod(_, _, Uninitialised()).
+    where fetch(receiver) --> Methods(methods);
+          lookup(methods, name) --> RMethod(_, _, Uninitialised()).
 
   Assign(into, field, assign, next) --> next'
     where into --> Object(into');
@@ -74,6 +74,7 @@ rules
 rules
 
   NoArguments() --> Objects([]).
+  Arguments([]) --> Objects([]).
   Arguments([term | terms]) --> Objects([location | locations])
     where term --> Object(location);
           Arguments(terms) --> Objects(locations).

@@ -7,7 +7,7 @@ signature
   constructors
     idsToStrings : List(ID) --> List(String)
     parametersToStrings : Parameters --> List(String)
-    concat : List(RMethod) * List(RMethod) --> Object
+    concat : List(RMethod) * List(RMethod) --> List(RMethod)
 
 rules
 
@@ -33,26 +33,34 @@ signature
     Assign : String -> Name
 
 signature
-  sort aliases Object = List(RMethod)
+  sorts Object
+  constructors
+    Methods : List(RMethod) -> Object
 
   constructors
-    initObject : List(Method) --> Object
-    initObject : List(Method) * List(Decl) --> Object
-    lookup     : List(RMethod) * Name --> RMethod
-    matchArgs  : List(String) * List(Location) --> List(Method)
+    initMethods : List(Method) --> List(RMethod)
+    initObject  : List(Method) --> Object
+    initObject  : List(Method) * List(Decl) --> Object
+    lookup      : List(RMethod) * Name --> RMethod
+    matchArgs   : List(String) * List(Location) --> List(RMethod)
 
 rules
 
-  initObject([]) --> [].
-  initObject([Method(name : String, params, body) | methods]) -->
-    [RMethod(Name(name), parametersToStrings(params), Body(body)) | methods']
-      where initObject(methods) --> methods'.
-  initObject([AssignMethod(name : String, param : String, body) | methods]) -->
-    [RMethod(Assign(name), [param], Body(body)) | methods']
-      where initObject(methods) --> methods'.
+  initMethods([]) --> [].
+  initMethods([Method(name : String, params, Body(decls, term)) | methods]) -->
+    [RMethod(Name(name), params', RBody(decls, Term(term))) | methods']
+      where parametersToStrings(params) --> params';
+            initMethods(methods) --> methods'.
+  initMethods([AssignMethod(name : String,
+                            param : String,
+                            Body(decls, term)) | methods]) -->
+    [RMethod(Assign(name), [param], RBody(decls, Term(term))) | methods']
+      where initMethods(methods) --> methods'.
 
-  initObject(methods, decls) --> concat(methods', decls')
-    where initObject(methods) --> methods';
+  initObject(methods) --> Methods(initMethods(methods)).
+
+  initObject(methods, decls) --> Methods(concat(methods', decls'))
+    where initMethods(methods) --> methods';
           declsToMethods(decls) --> decls'.
 
   lookup([method@RMethod(mname, _, _) | _], name) --> method
@@ -60,10 +68,15 @@ rules
   lookup([RMethod(mname, _, _) | methods], name) --> lookup(methods, name)
     where name != mname.
 
+  matchArgs([], []) --> [].
+  matchArgs([name | names], [location | locations]) -->
+    [RMethod(Name(name), [], RBody([], Ref(location))) | methods]
+      where matchArgs(names, locations) --> methods.
+
 signature
   sorts RMethod
   constructors
-    RMethod : Name * List(String) * RTerm -> RMethod
+    RMethod : Name * List(String) * RBody -> RMethod
 
   constructors
     names : List(RMethod) --> List(Name)
@@ -78,28 +91,30 @@ rules
   names([RMethod(name, _, _) | methods]) --> [name | names]
     where names(methods) --> names.
 
-  methodNames(object) --> names(object).
+  methodNames(Methods(object)) --> names(object).
 
   declToMethods(Def(name : String, _)) -->
     [RMethod(Name(name), [], Uninitialised())].
   declToMethods(Var(name, _)) --> declToMethods(Var(name)).
   declToMethods(Var(name : String)) -->
     [RMethod(Name(name), [], Uninitialised()),
-     RMethod(Assign(name), ["x"],
-             Assign(Self(), name, Request("x", NoArguments()), Self()))].
+     RMethod(Assign(name), ["x"], RBody([], Assign(Self(),
+                                                   name,
+                                                   Request("x", NoArguments()),
+                                                   Self())))].
 
   declsToMethods([]) --> [].
-  declsToMethods([decl | decls]) --> declToMethods(decl) + methods
+  declsToMethods([decl | decls]) --> concat(declToMethods(decl), methods)
     where declsToMethods(decls) --> methods.
 
 signature
-  sorts RTerm
+  sorts RBody RTerm
   constructors
-    Uninitialised : RTerm
-    Ref : Location -> RTerm
+    Uninitialised : RBody
+    RBody : List(Decl) * RTerm -> RBody
     Term : Term -> RTerm
-    Body : Body -> RTerm
-    RRequest : Location * Name * List(Location) --> RTerm
+    Ref : Location -> RTerm
+    RRequest : Location * Name * List(Location) -> RTerm
     Assign : Term * String * Term * Term -> RTerm
 
 signature

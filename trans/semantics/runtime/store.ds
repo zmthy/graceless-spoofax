@@ -5,7 +5,7 @@ imports
 
 signature
   sort aliases
-    Store = Map<Location, Object>
+    Store = Map<Int, Object>
   variables
     S : Store
 
@@ -16,9 +16,9 @@ signature
 
 rules
 
-  fetch(location) :: S --> S[location].
+  fetch(Location(i)) :: S --> S[i].
 
-  store(location, object) :: S --> { location |--> object, S }.
+  store(Location(i), object) :: S --> { i |--> object, S }.
 
   allocate(object) --> location :: S
     where fresh => location;
@@ -38,15 +38,16 @@ rules
 signature
   constructors
     setField : Location * String * Location --> Store
-    updateMethod : List(RMethod) * Name * RTerm --> Object
+    updateMethod : List(RMethod) * Name * RTerm --> List(RMethod)
 
 rules
 
-  setField(location, name, value) :: S -->
-    store(location, updateMethod(S[location], Name(name), Ref(value))).
+  setField(location@Location(i), name, value) :: S -->
+    store(location, Methods(updateMethod(methods, Name(name), Ref(value))))
+      where S[i] => Methods(methods).
 
   updateMethod([RMethod(mname, _, _) | methods], name, body) -->
-    [RMethod(name, [], body) | methods]
+    [RMethod(name, [], RBody([], body)) | methods]
       where name == mname.
   updateMethod([method@RMethod(mname, _, _) | methods], name, body) -->
     [method | updateMethod(methods, name, body)]

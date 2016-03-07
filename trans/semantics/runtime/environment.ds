@@ -11,7 +11,7 @@ signature
 
 signature
   sort aliases
-    Env = Map<Name, Location>
+    Env = Map<String, Location>
   variables
     E : Env
 
@@ -22,10 +22,10 @@ signature
 
 rules
 
-  E |- bindMethod(location, name) --> { name |--> location, E }.
+  E |- bindMethod(location, Name(name)) --> { name |--> location, E }.
 
   E |- bindMethods(_, []) --> E.
-  bindMethods(location, [name | names]) --> { name |--> location, E }
+  bindMethods(location, [Name(name) | names]) --> { name |--> location, E }
     where bindMethods(location, names) --> E.
 
-  E |- resolveMethod(name) --> E[name].
+  E |- resolveMethod(Name(name)) --> E[name].
