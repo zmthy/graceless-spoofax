@@ -58,8 +58,9 @@ rules
           matchArgs(params, args) --> methods;
           concat(methods, declsToMethods(decls)) --> methods';
           allocate(Methods(methods')) --> context;
-          bindMethods(context, names(methods')) --> E;
-          Env E, Self receiver |- body --> result.
+          bindMethods(receiver, names(object)) --> E;
+          E |- bindMethods(context, names(methods')) --> E';
+          E', Self receiver |- body --> result.
 
   RRequest(receiver, name, _) --> Error()
     where fetch(receiver) --> Methods(methods);
