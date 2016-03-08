@@ -23,13 +23,13 @@ context-free syntax
   Body.Body = [[Decl*] [Term]]
 
   // Declaration of a constant field or variable with the given value.
-  Decl.Def = [def [ID] = [Term];]
+  Decl.Def = [def [ID] = [Term]]
 
   // Declaration of a mutable field or variable with no initial value.
-  Decl.Var = [var [ID];]
+  Decl.Var = [var [ID]]
 
   // Declaration of a mutable field or variable with the given value.
-  Decl.Var = [var [ID] := [Term];]
+  Decl.Var = [var [ID] := [Term]]
 
   // Object literal expression.
   Term.Object = [object { [Method*] [Decl*] }]
