@@ -98,24 +98,52 @@ rules
   declToMethods(Var(name, _)) --> declToMethods(Var(name)).
   declToMethods(Var(name : String)) -->
     [RMethod(Name(name), [], Uninitialised()),
-     RMethod(Assign(name), ["x"], RBody([], Assign(Self(),
+     RMethod(Assign(name), ["x"], RBody([], Assign(Term(Self()),
                                                    name,
                                                    Request("x", NoArguments()),
-                                                   Self())))].
+                                                   Term(Self()))))].
 
   declsToMethods([]) --> [].
   declsToMethods([decl | decls]) --> concat(declToMethods(decl), methods)
     where declsToMethods(decls) --> methods.
 
 signature
-  sorts RBody RTerm
+  sorts RBody RTerm ObjectBody
   constructors
     Uninitialised : RBody
     RBody : List(Decl) * RTerm -> RBody
     Term : Term -> RTerm
     Ref : Location -> RTerm
     RRequest : Location * Name * List(Location) -> RTerm
-    Assign : Term * String * Term * Term -> RTerm
+    Assign : RTerm * String * Term * RTerm -> RTerm
+    ObjectBody : RTerm -> ObjectBody
+
+  constructors
+    declToAssign : Location * Decl * RTerm --> RTerm
+    declsToAssign : Location * List(Decl) * RTerm --> RTerm
+
+    // The ObjectBody type is used to prevent the body from being automatically
+    // transformed into a Value, as this will not correctly bind the environment
+    // as necessary.  The expectation is that the runtime term inside the
+    // ObjectBody constructor will be immediately evaluated to a value after
+    // it is constructed here.
+    declsToBody : Location * List(Decl) * RTerm --> ObjectBody
+
+rules
+
+  declToAssign(self, Def(name : String, term), next) -->
+    Assign(Ref(self), name, term, next).
+  declToAssign(_, Var(_), next) --> next.
+  declToAssign(self, Var(name : String, term), next) -->
+    Assign(Ref(self), name, term, next).
+
+  declsToAssign(_, [], next) --> next.
+  declsToAssign(self, [decl | decls], next) -->
+    declToAssign(self, decl, assign)
+      where declsToAssign(self, decls, next) --> assign.
+
+  declsToBody(self, decls, next) -->
+    ObjectBody(declsToAssign(self, decls, next)).
 
 signature
   sorts Value Values

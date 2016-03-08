@@ -26,17 +26,6 @@ rules
 
 signature
   constructors
-    newObject : List(Method) --> Location
-    newObject : List(Method) * List(Decl) --> Location
-
-rules
-
-  newObject(methods) --> allocate(initObject(methods)).
-
-  newObject(methods, decls) --> allocate(initObject(methods, decls)).
-
-signature
-  constructors
     setField : Location * String * Location --> Store
     updateMethod : List(RMethod) * Name * RTerm --> List(RMethod)
 
